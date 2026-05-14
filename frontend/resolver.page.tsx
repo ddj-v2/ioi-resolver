@@ -274,8 +274,7 @@ function start(data: ResolverInput, options: DisplaySettings): void {
 
     return (
       <>
-        {orderRef.current.map((teamIndex) => {
-          const team = teams[teamIndex];
+        {teams.map((team, teamIndex) => {
           const teamInfo = data.teams.find((item) => item.id === team.id);
           const spring = springs[teamIndex];
           if (!teamInfo || !spring) return null;

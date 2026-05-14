@@ -42,6 +42,9 @@ body {
 }
 
 .rank-list {
+  position: relative;
+  min-height: 100vh;
+  overflow: hidden;
   background: repeating-linear-gradient(
     180deg,
     #19222e 0px,
@@ -52,7 +55,9 @@ body {
 }
 
 .rank-list-item {
-  position: relative;
+  position: absolute;
+  left: 0;
+  right: 0;
   height: 86px;
   padding: 11px 0;
   display: flex;
