@@ -1,0 +1,167 @@
+body {
+  color: #f3f5f7;
+  background: #090c10;
+}
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  height: 56px;
+  padding: 10px 0;
+  background: #0e141d;
+  border-bottom: 1px solid rgba(130, 160, 196, 0.35);
+}
+
+.header .rank,
+.header .score {
+  width: 100px;
+  text-align: center;
+  font-size: 22px;
+}
+
+.header .content {
+  flex: 1;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  padding-right: 20px;
+}
+
+.header .title {
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.header .hint {
+  color: #85a1be;
+  font-size: 14px;
+}
+
+.rank-list {
+  background: repeating-linear-gradient(
+    180deg,
+    #19222e 0px,
+    #19222e 86px,
+    #0a0f16 86px,
+    #0a0f16 172px
+  );
+}
+
+.rank-list-item {
+  position: relative;
+  height: 86px;
+  padding: 11px 0;
+  display: flex;
+  align-items: center;
+}
+
+.rank-list-item .rank,
+.rank-list-item .score {
+  width: 100px;
+  text-align: center;
+  font-size: 40px;
+  font-weight: 700;
+}
+
+.rank-list-item .avatar {
+  width: 62px;
+  height: 62px;
+  border-radius: 8px;
+  margin-right: 14px;
+  object-fit: cover;
+}
+
+.rank-list-item .content {
+  flex: 1;
+  min-width: 0;
+  height: 62px;
+}
+
+.rank-list-item .name {
+  font-size: 30px;
+  margin-bottom: 5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rank-list-item .problems {
+  display: flex;
+  gap: 6px;
+}
+
+.rank-list-item .problems .item {
+  width: 86px;
+  border-radius: 4px;
+  text-align: center;
+  font-size: 20px;
+  line-height: 1.35;
+  padding: 3px 4px;
+}
+
+.ac {
+  background: #41b85b;
+}
+
+.partial {
+  background: #f1b54f;
+  color: #1e1a11;
+}
+
+.failed {
+  background: #d75057;
+}
+
+.frozen {
+  background: #4b7dd6;
+}
+
+.untouched {
+  background: #243142;
+  color: #6f829b;
+}
+
+.uncover {
+  animation: flashing 900ms infinite;
+}
+
+@keyframes flashing {
+  from { background-color: #4b7dd6; }
+  50% { background-color: #8eb0ef; }
+  to { background-color: #4b7dd6; }
+}
+
+@media (max-width: 1024px) {
+  .header .title {
+    font-size: 18px;
+  }
+
+  .header .hint {
+    display: none;
+  }
+
+  .rank-list-item .rank,
+  .rank-list-item .score {
+    width: 70px;
+    font-size: 28px;
+  }
+
+  .header .rank,
+  .header .score {
+    width: 70px;
+    font-size: 18px;
+  }
+
+  .rank-list-item .name {
+    font-size: 20px;
+  }
+
+  .rank-list-item .problems .item {
+    width: 64px;
+    font-size: 16px;
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "name": "hydrooj-ioi-resolver",
+  "version": "0.1.0",
+  "description": "IOI scoreboard resolver view for HydroOJ",
+  "main": "index.ts",
+  "license": "MIT",
+  "peerDependencies": {
+    "hydrooj": "*"
+  },
+  "dependencies": {
+    "@react-spring/web": "^10.0.3",
+    "react-use": "^17.6.0"
+  }
+}

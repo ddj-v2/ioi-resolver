@@ -1,0 +1,14 @@
+{% extends "layout/html5.html" %}
+{% block body %}
+{{ set(UiContext, 'payload', payload) }}
+<header class="header">
+  <span class="rank">#</span>
+  <span class="content">
+    <span class="title">IOI Resolver</span>
+    <span class="hint">Right Arrow / N / Space: Next Step</span>
+  </span>
+  <span class="score">Score</span>
+</header>
+<div class="rank-list" id="rank-list"></div>
+<link rel="stylesheet" href="/resolver.css?_={{ Date.now() }}" />
+{% endblock %}
