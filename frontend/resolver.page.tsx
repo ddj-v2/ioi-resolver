@@ -274,18 +274,19 @@ function start(data: ResolverInput, options: DisplaySettings): void {
 
     return (
       <>
-        {springs.map(({ y, zIndex }, index) => {
-          const team = teams[index];
+        {orderRef.current.map((teamIndex) => {
+          const team = teams[teamIndex];
           const teamInfo = data.teams.find((item) => item.id === team.id);
-          if (!teamInfo) return null;
+          const spring = springs[teamIndex];
+          if (!teamInfo || !spring) return null;
 
           return (
             <animated.div
               key={team.id}
               className="rank-list-item"
               style={{
-                y,
-                zIndex,
+                y: spring.y,
+                zIndex: spring.zIndex,
                 background: selectedTeam === team.id ? '#2f5f86' : 'transparent',
               }}
             >
