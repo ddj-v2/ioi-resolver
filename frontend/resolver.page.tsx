@@ -240,21 +240,35 @@ function start(data: ResolverInput, options: DisplaySettings): void {
     }));
 
     async function updateRankAnimation() {
+      console.log('updateRankAnimation: computing new order');
       orderRef.current = rankTeams(teams);
-      api.start((index) => ({
-        y: orderRef.current.indexOf(index) * 86 - index * 86,
-        zIndex: 0,
-        config: {
-          easing: easings.steps(5),
-        },
-      }));
+      console.log('updateRankAnimation: new order', orderRef.current);
+      api.start((index) => {
+        const y = orderRef.current.indexOf(index) * 86 - index * 86;
+        console.log('updateRankAnimation: spring index', index, 'y', y);
+        return {
+          y,
+          zIndex: 0,
+          config: {
+            easing: easings.steps(5),
+          },
+        };
+      });
     }
 
+    const runningRef = React.useRef(false);
+
     async function runNext() {
+      if (runningRef.current) {
+        console.log('runNext ignored because another run is in progress');
+        return;
+      }
+      runningRef.current = true;
       console.log('runNext start opIndex', opIndex, 'opsLen', ops.length, 'teamsLen', teams.length, 'order', orderRef.current);
       const op = ops[opIndex];
       if (!op) {
         console.log('runNext: no op at index', opIndex);
+        runningRef.current = false;
         return;
       }
 
@@ -268,13 +282,20 @@ function start(data: ResolverInput, options: DisplaySettings): void {
       setSelectedProblem(null);
 
       const before = JSON.stringify(orderRef.current);
-      const after = JSON.stringify(rankTeams(teams));
+      const afterOrder = rankTeams(teams);
+      const after = JSON.stringify(afterOrder);
+      console.log('runNext: beforeOrder', orderRef.current);
+      console.log('runNext: afterOrder', afterOrder);
       if (before !== after) {
+        console.log('runNext: order changed — updating animation');
         await updateRankAnimation();
+      } else {
+        console.log('runNext: order unchanged');
       }
 
       setOpIndex((value) => value + 1);
       setRenderToken((value) => value + 1);
+      runningRef.current = false;
     }
 
     useKey(
