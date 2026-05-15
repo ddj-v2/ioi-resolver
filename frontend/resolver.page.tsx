@@ -284,7 +284,11 @@ function start(data: ResolverInput, options: DisplaySettings): void {
               key={team.id}
               className="rank-list-item"
               style={{
-                y: spring.y,
+                position: 'absolute',
+                left: 0,
+                right: 0,
+                top: `${teamIndex * 86}px`,
+                transform: spring.y.to((v: number) => `translateY(${v}px)`),
                 zIndex: spring.zIndex,
                 background: selectedTeam === team.id ? '#2f5f86' : 'transparent',
               }}
