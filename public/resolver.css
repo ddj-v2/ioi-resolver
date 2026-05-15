@@ -44,7 +44,8 @@ body {
 .rank-list {
   position: relative;
   min-height: 100vh;
-  overflow: hidden;
+  overflow: auto;
+  padding-bottom: 200px;
   background: repeating-linear-gradient(
     180deg,
     #19222e 0px,
