@@ -307,16 +307,18 @@ function start(data: ResolverInput, options: DisplaySettings): void {
           const teamInfo = data.teams.find((item) => item.id === team.id);
           if (!teamInfo) return null;
 
+          const stripeClass = visualIndex % 2 === 0 ? 'even' : 'odd';
+          const selClass = selectedTeam === team.id ? 'selected' : '';
+
           return (
             <div
               key={team.id}
-              className="rank-list-item"
+              className={`rank-list-item ${stripeClass} ${selClass}`}
               style={{
                 position: 'absolute',
                 left: 0,
                 right: 0,
                 top: `${visualIndex * 86}px`,
-                background: selectedTeam === team.id ? '#2f5f86' : 'transparent',
               }}
             >
               <div className="rank">{team.rank === -1 ? '⭐' : team.rank}</div>

@@ -56,13 +56,7 @@ body {
   overflow: auto;
   padding-bottom: 200px;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
-  background: repeating-linear-gradient(
-    180deg,
-    #18212c 0px,
-    #18212c 86px,
-    #0a0f16 86px,
-    #0a0f16 172px
-  );
+  background: #0a0f16;
 }
 
 .rank-list-item {
@@ -76,6 +70,18 @@ body {
   transition: top 450ms ease, background-color 200ms ease;
   will-change: top;
   box-sizing: border-box;
+}
+
+.rank-list-item.even {
+  background: #18212c;
+}
+
+.rank-list-item.odd {
+  background: #0a0f16;
+}
+
+.rank-list-item.selected {
+  background: #2f5f86 !important;
 }
 
 .rank-list-item .rank,
