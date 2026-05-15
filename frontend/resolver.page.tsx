@@ -4,7 +4,6 @@ import {
   React,
   ReactDOM,
 } from '@hydrooj/ui-default';
-import { animated, easings, useSprings } from '@react-spring/web';
 import useKey from 'react-use/lib/useKey';
 import { ResolverInput } from '../interface';
 
@@ -222,19 +221,9 @@ function start(data: ResolverInput, options: DisplaySettings): void {
   const title = document.querySelector('.header .title');
   if (title) title.textContent = data.name;
 
-  console.log('IOI Resolver start', data.name, 'teams', data.teams.length, 'problems', data.problems.length);
-  // Global keydown listener as an early fallback to ensure key events are captured
-  window.addEventListener('keydown', (e) => {
-    const k = (e as KeyboardEvent).key;
-    if (k === 'ArrowRight' || k === 'n' || k === 'N' || (e as KeyboardEvent).code === 'Space' || k === ' ') {
-      console.log('global keydown (startup listener) detected key:', k, (e as KeyboardEvent).code);
-    }
-  });
-
   function MainList(props: MainProps) {
     const teams = React.useMemo(() => buildStates(props.data), [props.data]);
     const ops = React.useMemo(() => operationsFor(teams), [teams]);
-    console.log('MainList mounted', 'teamsLen', teams.length, 'opsLen', ops.length);
 
     const [selectedTeam, setSelectedTeam] = React.useState('');
     const [selectedProblem, setSelectedProblem] = React.useState<string | null>(null);
@@ -243,42 +232,20 @@ function start(data: ResolverInput, options: DisplaySettings): void {
 
     const orderRef = React.useRef(rankTeams(teams));
 
-    const [springs, api] = useSprings(teams.length, (index) => ({
-      y: orderRef.current.indexOf(index) * 86 - index * 86,
-      zIndex: 0,
-      immediate: (key: string) => key === 'y' || key === 'zIndex',
-    }));
-
     async function updateRankAnimation() {
-      console.log('updateRankAnimation: computing new order');
       orderRef.current = rankTeams(teams);
-      console.log('updateRankAnimation: new order', orderRef.current);
-      api.start((index) => {
-        const y = orderRef.current.indexOf(index) * 86 - index * 86;
-        console.log('updateRankAnimation: spring index', index, 'y', y);
-        return {
-          y,
-          zIndex: 0,
-          config: {
-            easing: easings.steps(5),
-          },
-        };
-      });
     }
 
     const runningRef = React.useRef(false);
 
     async function runNext() {
       if (runningRef.current) {
-        console.log('runNext ignored because another run is in progress');
         return;
       }
       runningRef.current = true;
       try {
-        console.log('runNext start opIndex', opIndex, 'opsLen', ops.length, 'teamsLen', teams.length, 'order', orderRef.current);
         const op = ops[opIndex];
         if (!op) {
-          console.log('runNext: no op at index', opIndex);
           return;
         }
 
@@ -294,13 +261,8 @@ function start(data: ResolverInput, options: DisplaySettings): void {
         const before = JSON.stringify(orderRef.current);
         const afterOrder = rankTeams(teams);
         const after = JSON.stringify(afterOrder);
-        console.log('runNext: beforeOrder', orderRef.current);
-        console.log('runNext: afterOrder', afterOrder);
         if (before !== after) {
-          console.log('runNext: order changed — updating animation');
           await updateRankAnimation();
-        } else {
-          console.log('runNext: order unchanged');
         }
 
         setOpIndex((value) => value + 1);
@@ -312,20 +274,18 @@ function start(data: ResolverInput, options: DisplaySettings): void {
 
     useKey(
       (event) => event.key === 'ArrowRight' || event.key === 'n' || event.key === 'N' || event.code === 'Space' || event.key === ' ',
-      (event) => {
-        console.log('useKey detected key:', event.key, event.code);
+      () => {
         runNext();
       },
       {},
       [opIndex, ops],
     );
 
-    // Fallback listener: ensure keydown triggers even if useKey doesn't fire
+    // Fallback listener: ensure keydown triggers even if useKey doesn't fire.
     React.useEffect(() => {
       const handler = (event: KeyboardEvent) => {
         const k = event.key;
         if (k === 'ArrowRight' || k === 'n' || k === 'N' || event.code === 'Space' || k === ' ') {
-          console.log('window.keydown detected key:', k, event.code, 'opIndex', opIndex, 'opsLen', ops.length);
           runNext();
         }
       };
@@ -335,22 +295,20 @@ function start(data: ResolverInput, options: DisplaySettings): void {
 
     return (
       <>
-        {teams.map((team, teamIndex) => {
+        {orderRef.current.map((teamIndex, visualIndex) => {
+          const team = teams[teamIndex];
           const teamInfo = data.teams.find((item) => item.id === team.id);
-          const spring = springs[teamIndex];
-          if (!teamInfo || !spring) return null;
+          if (!teamInfo) return null;
 
           return (
-            <animated.div
+            <div
               key={team.id}
               className="rank-list-item"
               style={{
                 position: 'absolute',
                 left: 0,
                 right: 0,
-                top: `${teamIndex * 86}px`,
-                transform: spring.y.to((v: number) => `translateY(${v}px)`),
-                zIndex: spring.zIndex,
+                top: `${visualIndex * 86}px`,
                 background: selectedTeam === team.id ? '#2f5f86' : 'transparent',
               }}
             >
@@ -378,7 +336,7 @@ function start(data: ResolverInput, options: DisplaySettings): void {
                 </div>
               </div>
               <div className="score">{team.score}</div>
-            </animated.div>
+            </div>
           );
         })}
       </>
