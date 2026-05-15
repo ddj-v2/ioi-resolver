@@ -189,21 +189,31 @@ function operationsFor(teams: TeamState[]): RevealOperation[] {
 }
 
 async function scrollTo(offset: number): Promise<void> {
-  const fixedOffset = offset.toFixed();
-  await new Promise((resolve) => {
-    const onScroll = function onScroll() {
-      if (window.pageYOffset.toFixed() === fixedOffset) {
-        window.removeEventListener('scroll', onScroll);
-        resolve(null);
+  const target = Math.max(0, Math.round(offset));
+  await new Promise<void>((resolve) => {
+    let settled = false;
+    const finish = () => {
+      if (settled) return;
+      settled = true;
+      window.removeEventListener('scroll', onScroll);
+      window.clearTimeout(timerId);
+      resolve();
+    };
+
+    const onScroll = () => {
+      if (Math.round(window.pageYOffset) === target) {
+        finish();
       }
     };
 
+    const timerId = window.setTimeout(finish, 1200);
     window.addEventListener('scroll', onScroll);
-    onScroll();
     window.scrollTo({
-      top: offset,
+      top: target,
       behavior: 'smooth',
     });
+    window.requestAnimationFrame(onScroll);
+    window.requestAnimationFrame(() => window.requestAnimationFrame(onScroll));
   });
 }
 
@@ -264,38 +274,40 @@ function start(data: ResolverInput, options: DisplaySettings): void {
         return;
       }
       runningRef.current = true;
-      console.log('runNext start opIndex', opIndex, 'opsLen', ops.length, 'teamsLen', teams.length, 'order', orderRef.current);
-      const op = ops[opIndex];
-      if (!op) {
-        console.log('runNext: no op at index', opIndex);
+      try {
+        console.log('runNext start opIndex', opIndex, 'opsLen', ops.length, 'teamsLen', teams.length, 'order', orderRef.current);
+        const op = ops[opIndex];
+        if (!op) {
+          console.log('runNext: no op at index', opIndex);
+          return;
+        }
+
+        const position = orderRef.current.indexOf(teams.findIndex((team) => team.id === op.teamId));
+        await scrollTo(position * 86 - window.innerHeight + 270);
+        setSelectedTeam(op.teamId);
+        setSelectedProblem(op.problemId);
+
+        await new Promise((resolve) => setTimeout(resolve, 700));
+        applyReveal(teams, op);
+        setSelectedProblem(null);
+
+        const before = JSON.stringify(orderRef.current);
+        const afterOrder = rankTeams(teams);
+        const after = JSON.stringify(afterOrder);
+        console.log('runNext: beforeOrder', orderRef.current);
+        console.log('runNext: afterOrder', afterOrder);
+        if (before !== after) {
+          console.log('runNext: order changed — updating animation');
+          await updateRankAnimation();
+        } else {
+          console.log('runNext: order unchanged');
+        }
+
+        setOpIndex((value) => value + 1);
+        setRenderToken((value) => value + 1);
+      } finally {
         runningRef.current = false;
-        return;
       }
-
-      const position = orderRef.current.indexOf(teams.findIndex((team) => team.id === op.teamId));
-      await scrollTo(position * 86 - window.innerHeight + 270);
-      setSelectedTeam(op.teamId);
-      setSelectedProblem(op.problemId);
-
-      await new Promise((resolve) => setTimeout(resolve, 700));
-      applyReveal(teams, op);
-      setSelectedProblem(null);
-
-      const before = JSON.stringify(orderRef.current);
-      const afterOrder = rankTeams(teams);
-      const after = JSON.stringify(afterOrder);
-      console.log('runNext: beforeOrder', orderRef.current);
-      console.log('runNext: afterOrder', afterOrder);
-      if (before !== after) {
-        console.log('runNext: order changed — updating animation');
-        await updateRankAnimation();
-      } else {
-        console.log('runNext: order unchanged');
-      }
-
-      setOpIndex((value) => value + 1);
-      setRenderToken((value) => value + 1);
-      runningRef.current = false;
     }
 
     useKey(
