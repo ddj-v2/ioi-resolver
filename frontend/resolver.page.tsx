@@ -25,6 +25,7 @@ type ProblemState = {
   frozenBestScore: number;
   oldSubmissions: number;
   frozenSubmissions: number;
+  frozenScores: number[];
 };
 
 type RevealOperation = {
@@ -101,6 +102,7 @@ function buildStates(data: ResolverInput): TeamState[] {
         frozenBestScore: 0,
         oldSubmissions: 0,
         frozenSubmissions: 0,
+        frozenScores: [],
       })),
     });
   }
@@ -117,6 +119,7 @@ function buildStates(data: ResolverInput): TeamState[] {
 
     if (submission.time > data.frozen) {
       problem.frozenSubmissions += 1;
+      problem.frozenScores.push(submission.score);
       if (submission.score > problem.frozenBestScore) {
         problem.frozenBestScore = submission.score;
       }
@@ -138,7 +141,7 @@ function cloneTeams(teams: TeamState[]): TeamState[] {
 }
 
 function getNextRevealable(team: TeamState): ProblemState | undefined {
-  return team.problems.find((problem) => problem.frozenSubmissions > 0);
+  return team.problems.find((problem) => problem.frozenSubmissions > 0 && problem.frozenScores.length > 0);
 }
 
 function applyReveal(teams: TeamState[], operation: RevealOperation): void {
@@ -147,13 +150,17 @@ function applyReveal(teams: TeamState[], operation: RevealOperation): void {
   const problem = team.problems.find((item) => item.id === operation.problemId);
   if (!problem) return;
 
+  // Reveal one frozen submission (per-testset) at a time.
   const oldWeighted = weighted(problem);
-  problem.oldSubmissions += problem.frozenSubmissions;
-  if (problem.frozenBestScore > problem.oldScore) {
-    problem.oldScore = problem.frozenBestScore;
+  const nextScore = problem.frozenScores.shift();
+  if (typeof nextScore === 'number') {
+    problem.frozenSubmissions = Math.max(0, problem.frozenSubmissions - 1);
+    if (nextScore > problem.oldScore) {
+      problem.oldScore = nextScore;
+    }
+    // Update best remaining frozen score
+    problem.frozenBestScore = problem.frozenScores.reduce((m, v) => Math.max(m, v), 0);
   }
-  problem.frozenSubmissions = 0;
-  problem.frozenBestScore = 0;
 
   // IOI partial scores are accumulated as score delta on each reveal.
   const delta = Math.round(weighted(problem) - oldWeighted);
@@ -273,7 +280,7 @@ function start(data: ResolverInput, options: DisplaySettings): void {
     }
 
     useKey(
-      (event) => event.key === 'ArrowRight' || event.key === 'n' || event.key === 'N' || event.code === 'Space' || event.key === ' ',
+      (event: KeyboardEvent) => event.key === 'ArrowRight' || event.key === 'n' || event.key === 'N' || event.code === 'Space' || event.key === ' ',
       () => {
         runNext();
       },
