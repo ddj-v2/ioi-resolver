@@ -212,9 +212,19 @@ function start(data: ResolverInput, options: DisplaySettings): void {
   const title = document.querySelector('.header .title');
   if (title) title.textContent = data.name;
 
+  console.log('IOI Resolver start', data.name, 'teams', data.teams.length, 'problems', data.problems.length);
+  // Global keydown listener as an early fallback to ensure key events are captured
+  window.addEventListener('keydown', (e) => {
+    const k = (e as KeyboardEvent).key;
+    if (k === 'ArrowRight' || k === 'n' || k === 'N' || (e as KeyboardEvent).code === 'Space' || k === ' ') {
+      console.log('global keydown (startup listener) detected key:', k, (e as KeyboardEvent).code);
+    }
+  });
+
   function MainList(props: MainProps) {
     const teams = React.useMemo(() => buildStates(props.data), [props.data]);
     const ops = React.useMemo(() => operationsFor(teams), [teams]);
+    console.log('MainList mounted', 'teamsLen', teams.length, 'opsLen', ops.length);
 
     const [selectedTeam, setSelectedTeam] = React.useState('');
     const [selectedProblem, setSelectedProblem] = React.useState<string | null>(null);
@@ -241,10 +251,10 @@ function start(data: ResolverInput, options: DisplaySettings): void {
     }
 
     async function runNext() {
-      console.debug('runNext start opIndex', opIndex, 'opsLen', ops.length, 'teamsLen', teams.length, 'order', orderRef.current);
+      console.log('runNext start opIndex', opIndex, 'opsLen', ops.length, 'teamsLen', teams.length, 'order', orderRef.current);
       const op = ops[opIndex];
       if (!op) {
-        console.debug('runNext: no op at index', opIndex);
+        console.log('runNext: no op at index', opIndex);
         return;
       }
 
@@ -270,7 +280,7 @@ function start(data: ResolverInput, options: DisplaySettings): void {
     useKey(
       (event) => event.key === 'ArrowRight' || event.key === 'n' || event.key === 'N' || event.code === 'Space' || event.key === ' ',
       (event) => {
-        console.debug('useKey detected key:', event.key, event.code);
+        console.log('useKey detected key:', event.key, event.code);
         runNext();
       },
       {},
@@ -282,7 +292,7 @@ function start(data: ResolverInput, options: DisplaySettings): void {
       const handler = (event: KeyboardEvent) => {
         const k = event.key;
         if (k === 'ArrowRight' || k === 'n' || k === 'N' || event.code === 'Space' || k === ' ') {
-          console.debug('window.keydown detected key:', k, event.code, 'opIndex', opIndex, 'opsLen', ops.length);
+          console.log('window.keydown detected key:', k, event.code, 'opIndex', opIndex, 'opsLen', ops.length);
           runNext();
         }
       };
