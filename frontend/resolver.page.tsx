@@ -241,8 +241,12 @@ function start(data: ResolverInput, options: DisplaySettings): void {
     }
 
     async function runNext() {
+      console.debug('runNext start opIndex', opIndex, 'opsLen', ops.length, 'teamsLen', teams.length, 'order', orderRef.current);
       const op = ops[opIndex];
-      if (!op) return;
+      if (!op) {
+        console.debug('runNext: no op at index', opIndex);
+        return;
+      }
 
       const position = orderRef.current.indexOf(teams.findIndex((team) => team.id === op.teamId));
       await scrollTo(position * 86 - window.innerHeight + 270);
@@ -265,12 +269,26 @@ function start(data: ResolverInput, options: DisplaySettings): void {
 
     useKey(
       (event) => event.key === 'ArrowRight' || event.key === 'n' || event.key === 'N' || event.code === 'Space' || event.key === ' ',
-      () => {
+      (event) => {
+        console.debug('useKey detected key:', event.key, event.code);
         runNext();
       },
       {},
       [opIndex, ops],
     );
+
+    // Fallback listener: ensure keydown triggers even if useKey doesn't fire
+    React.useEffect(() => {
+      const handler = (event: KeyboardEvent) => {
+        const k = event.key;
+        if (k === 'ArrowRight' || k === 'n' || k === 'N' || event.code === 'Space' || k === ' ') {
+          console.debug('window.keydown detected key:', k, event.code, 'opIndex', opIndex, 'opsLen', ops.length);
+          runNext();
+        }
+      };
+      window.addEventListener('keydown', handler);
+      return () => window.removeEventListener('keydown', handler);
+    }, [opIndex, ops]);
 
     return (
       <>
