@@ -1,6 +1,8 @@
 body {
+  margin: 0;
   color: #f3f5f7;
   background: #090c10;
+  font-family: "Segoe UI", "Noto Sans TC", "Microsoft JhengHei", sans-serif;
 }
 
 .header {
@@ -9,10 +11,11 @@ body {
   z-index: 20;
   display: flex;
   align-items: center;
-  height: 56px;
-  padding: 10px 0;
-  background: #0e141d;
+  min-height: 64px;
+  padding: 10px 16px;
+  background: linear-gradient(180deg, #101822 0%, #0c121a 100%);
   border-bottom: 1px solid rgba(130, 160, 196, 0.35);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18);
 }
 
 .header .rank,
@@ -20,20 +23,26 @@ body {
   width: 100px;
   text-align: center;
   font-size: 22px;
+  font-weight: 700;
 }
 
 .header .content {
   flex: 1;
   display: flex;
-  align-items: baseline;
+  align-items: center;
   justify-content: space-between;
   gap: 16px;
-  padding-right: 20px;
+  padding: 0 12px;
+  min-width: 0;
 }
 
 .header .title {
   font-size: 24px;
   font-weight: 700;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .header .hint {
@@ -46,10 +55,11 @@ body {
   min-height: 100vh;
   overflow: auto;
   padding-bottom: 200px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
   background: repeating-linear-gradient(
     180deg,
-    #19222e 0px,
-    #19222e 86px,
+    #18212c 0px,
+    #18212c 86px,
     #0a0f16 86px,
     #0a0f16 172px
   );
@@ -60,11 +70,12 @@ body {
   left: 0;
   right: 0;
   height: 86px;
-  padding: 11px 0;
+  padding: 10px 16px;
   display: flex;
   align-items: center;
   transition: top 450ms ease, background-color 200ms ease;
   will-change: top;
+  box-sizing: border-box;
 }
 
 .rank-list-item .rank,
@@ -73,6 +84,7 @@ body {
   text-align: center;
   font-size: 40px;
   font-weight: 700;
+  flex: 0 0 100px;
 }
 
 .rank-list-item .avatar {
@@ -81,17 +93,22 @@ body {
   border-radius: 8px;
   margin-right: 14px;
   object-fit: cover;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.24);
 }
 
 .rank-list-item .content {
   flex: 1;
   min-width: 0;
   height: 62px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .rank-list-item .name {
-  font-size: 30px;
-  margin-bottom: 5px;
+  font-size: 26px;
+  line-height: 1.1;
+  margin-bottom: 4px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -100,6 +117,7 @@ body {
 .rank-list-item .problems {
   display: flex;
   gap: 6px;
+  flex-wrap: nowrap;
 }
 
 .rank-list-item .problems .item {
@@ -109,6 +127,7 @@ body {
   font-size: 20px;
   line-height: 1.35;
   padding: 3px 4px;
+  box-sizing: border-box;
 }
 
 .ac {
@@ -144,6 +163,10 @@ body {
 }
 
 @media (max-width: 1024px) {
+  .header {
+    padding: 10px 12px;
+  }
+
   .header .title {
     font-size: 18px;
   }
@@ -171,5 +194,9 @@ body {
   .rank-list-item .problems .item {
     width: 64px;
     font-size: 16px;
+  }
+
+  .rank-list-item {
+    padding: 10px 12px;
   }
 }
