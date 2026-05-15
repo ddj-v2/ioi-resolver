@@ -55,6 +55,8 @@ body {
   min-height: 100vh;
   overflow: auto;
   padding-bottom: 200px;
+  padding-top: 80px;
+  scroll-padding-top: 80px;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
   background: #0a0f16;
 }
